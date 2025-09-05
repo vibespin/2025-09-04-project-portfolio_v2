@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "title": "Support A/B Testing",
+    "tagline": "Full-stack customer support system with integrated A/B testing infrastructure. Features real-time statistical analysis, dynamic conversion tracking, and comprehensive experiment management for data...",
+    "category": "Analytics & Testing",
+    "githubUrl": "https://github.com/vibespin/2025-09-02-support-ab-testing",
+    "image": "https://opengraph.githubassets.com/1/vibespin/2025-09-02-support-ab-testing",
+    "updated_at": "2025-09-02T00:00:00Z",
+    "language": "JavaScript",
+    "stars": 0
+  },
+  {
+    "id": 2,
+    "title": "Payments Flow",
+    "tagline": "Payments flow learning project with payment processing, subscription management, and e-commerce flow",
+    "category": "E-commerce",
+    "githubUrl": "https://github.com/vibespin/2025-08-28-payments-flow",
+    "image": "https://opengraph.githubassets.com/1/vibespin/2025-08-28-payments-flow",
+    "updated_at": "2025-08-28T00:00:00Z",
+    "language": "TypeScript",
+    "stars": 1
+  },
+  {
+    "id": 3,
+    "title": "Isometric Imagen",
+    "tagline": "AI image generation and processing tool with isometric design capabilities",
+    "category": "AI Generative Media",
+    "githubUrl": "https://github.com/vibespin/2025-08-29-isometric-imgen",
+    "image": "https://opengraph.githubassets.com/1/vibespin/2025-08-29-isometric-imgen",
+    "updated_at": "2025-08-29T00:00:00Z",
+    "language": "TypeScript",
+    "stars": 0
+  },
+  {
+    "id": 4,
+    "title": "User Analytics V2",
+    "tagline": "User analytics project with event tracking, user feedback, and analytics dashboard",
+    "category": "User Research",
+    "githubUrl": "https://github.com/vibespin/2025-08-26-user-analytics-v2",
+    "image": "https://opengraph.githubassets.com/1/vibespin/2025-08-26-user-analytics-v2",
+    "updated_at": "2025-08-26T00:00:00Z",
+    "language": "TypeScript",
+    "stars": 1
+  },
+  {
+    "id": 5,
+    "title": "User Analytics",
+    "tagline": "User analytics project with event tracking, user feedback, and analytics dashboard",
+    "category": "User Research",
+    "githubUrl": "https://github.com/vibespin/2025-08-27-user-analytics",
+    "image": "https://opengraph.githubassets.com/1/vibespin/2025-08-27-user-analytics",
+    "updated_at": "2025-08-27T00:00:00Z",
+    "language": "TypeScript",
+    "stars": 1
+  },
+  {
+    "id": 6,
+    "title": "Landing Onboarding Flow",
+    "tagline": "Landing page with email capture, onboarding sequence, and product trial flow",
+    "category": "User Experience",
+    "githubUrl": "https://github.com/vibespin/2025-08-25-landing-onboarding-flow",
+    "image": "https://opengraph.githubassets.com/1/vibespin/2025-08-25-landing-onboarding-flow",
+    "updated_at": "2025-08-25T00:00:00Z",
+    "language": null,
+    "stars": 1
+  },
+  {
+    "id": 7,
+    "title": "API Gateway V2",
+    "tagline": "Advanced API gateway with rate limiting, authentication, and request transformation",
+    "category": "Backend Infrastructure",
+    "githubUrl": "https://github.com/vibespin/2025-08-27-api-gateway-v2",
+    "image": "https://opengraph.githubassets.com/1/vibespin/2025-08-27-api-gateway-v2",
+    "updated_at": "2025-08-27T00:00:00Z",
+    "language": "Go",
+    "stars": 2
+  },
+  {
+    "id": 8,
+    "title": "Database Migration Tool",
+    "tagline": "Automated database migration and rollback system with version control",
+    "category": "Backend Infrastructure",
+    "githubUrl": "https://github.com/vibespin/2025-08-27-db-migration-tool",
+    "image": "https://opengraph.githubassets.com/1/vibespin/2025-08-27-db-migration-tool",
+    "updated_at": "2025-08-27T00:00:00Z",
+    "language": "Python",
+    "stars": 0
+  },
+  {
+    "id": 9,
+    "title": "Current Date Test Project",
+    "tagline": "Test project for current date indicator - created today to test the highlighting",
+    "category": "Testing",
+    "githubUrl": "https://github.com/vibespin/2025-09-04-current-date-test",
+    "image": "https://opengraph.githubassets.com/1/vibespin/2025-09-04-current-date-test",
+    "updated_at": "2025-09-04T00:00:00Z",
+    "language": "JavaScript",
+    "stars": 0
+  },
+  {
+    "id": 10,
+    "title": "Legacy Portfolio Site",
+    "tagline": "Old portfolio website without date prefix - should appear in misc section",
+    "category": "Web Development",
+    "githubUrl": "https://github.com/vibespin/legacy-portfolio-site",
+    "image": "https://opengraph.githubassets.com/1/vibespin/legacy-portfolio-site",
+    "updated_at": "2025-01-15T00:00:00Z",
+    "language": "HTML",
+    "stars": 0
+  }
+]

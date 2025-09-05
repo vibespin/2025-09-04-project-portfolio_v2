@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Showcase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#8B5CF6'
+                    },
+                    fontFamily: {
+                        'sans': ['Roboto Mono', 'monospace'],
+                        'mono': ['Roboto Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Reset and base typography */
+        * {
+            font-family: 'Roboto Mono', monospace !important;
+        }
+        
+        /* Typography improvements for Roboto Mono */
+        h1 {
+            font-size: 2.5rem !important;
+            font-weight: 400 !important;
+            letter-spacing: -0.025em !important;
+        }
+        
+        .day-header .font-medium {
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.025em !important;
+        }
+        
+        .project-card h3 {
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            line-height: 1.25 !important;
+            letter-spacing: -0.01em !important;
+        }
+        
+        .project-card p {
+            font-size: 0.75rem !important;
+            line-height: 1.4 !important;
+            letter-spacing: 0.01em !important;
+        }
+        
+        .project-card .text-xs {
+            font-size: 0.6875rem !important;
+            letter-spacing: 0.015em !important;
+        }
+        
+        .day-label {
+            font-size: 0.6875rem !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.02em !important;
+        }
+        
+        /* Category tags */
+        .project-card span[class*="bg-blue-50"] {
+            font-size: 0.625rem !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.025em !important;
+            padding: 0.25rem 0.5rem !important;
+        }
+        
+        /* Filter and button text */
+        button {
+            font-size: 0.75rem !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.01em !important;
+        }
+        
+        /* GitHub link text */
+        .text-xl {
+            font-size: 1.125rem !important;
+            font-weight: 400 !important;
+        }
+        
+        /* Card Layout with Horizontal Alignment */
+        .card-content {
+            padding: 1.25rem !important;
+            height: 16rem !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        
+        /* Header section - fixed height for alignment */
+        .card-header {
+            height: 1.75rem !important;
+            display: flex !important;
+            align-items: flex-end !important;
+            justify-content: flex-start !important;
+            margin-bottom: 0.75rem !important;
+        }
+        
+        .card-category {
+            font-size: 0.625rem !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            padding: 0.375rem 0.75rem !important;
+        }
+        
+        /* Body section - controlled spacing */
+        .card-body {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        
+        /* Title section - fixed height for alignment */
+        .card-title-section {
+            height: 2.75rem !important;
+            display: flex !important;
+            align-items: flex-end !important;
+            margin-bottom: 0.75rem !important;
+        }
+        
+        .card-title {
+            font-size: 1rem !important;
+            font-weight: 600 !important;
+            line-height: 1.3 !important;
+            color: #1f2937 !important;
+            margin: 0 !important;
+        }
+        
+        /* Description section - fixed height for consistent alignment */
+        .card-description-section {
+            height: 5.5rem !important;
+            display: flex !important;
+            align-items: flex-start !important;
+            margin-bottom: 0.75rem !important;
+            overflow: hidden !important;
+        }
+        
+        .card-description {
+            font-size: 0.8125rem !important;
+            line-height: 1.5 !important;
+            color: #6b7280 !important;
+        }
+        
+        /* Footer section - fixed at bottom */
+        .card-footer {
+            height: 1.75rem !important;
+            display: flex !important;
+            align-items: center !important;
+            margin-top: auto !important;
+        }
+        
+        .card-actions {
+            display: flex !important;
+            align-items: center !important;
+            gap: 1rem !important;
+        }
+        
+        .card-link {
+            font-size: 0.75rem !important;
+            font-weight: 500 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+        }
+        
+        .card-link svg {
+            width: 0.875rem !important;
+            height: 0.875rem !important;
+        }
+        
+        /* Streak/Heatmap View Styles */
+        .streak-view {
+            transition: all 0.3s ease;
+        }
+        
+        .streak-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        
+        .streak-month-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .streak-month-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #6b7280;
+            width: 3rem;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        
+        .streak-month-grid {
+            display: grid;
+            grid-template-columns: repeat(31, 1fr);
+            gap: 2px;
+            flex: 1;
+        }
+        
+        .streak-day {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        /* Intensity levels like GitHub */
+        .streak-day.empty {
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .streak-day.level-1 {
+            background-color: #dbeafe;
+            border: 1px solid #bfdbfe;
+        }
+        
+        .streak-day.level-2 {
+            background-color: #93c5fd;
+            border: 1px solid #60a5fa;
+        }
+        
+        .streak-day.level-3 {
+            background-color: #3b82f6;
+            border: 1px solid #2563eb;
+        }
+        
+        .streak-day.level-4 {
+            background-color: #1d4ed8;
+            border: 1px solid #1e40af;
+        }
+        
+        .streak-day:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+        
+        /* Streak view layout adjustments */
+        .calendar-header-container.streak-mode,
+        .week-label-external.streak-mode {
+            display: none;
+        }
+        
+        /* Streak tooltip/preview card */
+        .streak-tooltip {
+            position: absolute;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 0.75rem;
+            z-index: 1000;
+            pointer-events: none;
+            min-width: 200px;
+            max-width: 300px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        
+        .streak-tooltip.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .streak-tooltip-date {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .streak-tooltip-empty {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-style: italic;
+        }
+        
+        .streak-tooltip-project {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.375rem;
+            font-size: 0.75rem;
+        }
+        
+        .streak-tooltip-project:last-child {
+            margin-bottom: 0;
+        }
+        
+        .streak-tooltip-category {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            flex-shrink: 0;
+        }
+        
+        .streak-tooltip-title {
+            color: #374151;
+            font-weight: 500;
+            flex: 1;
+            line-height: 1.3;
+        }
+        
+        /* Line clamp utility for tooltips */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+        
+        /* Year view header */
+        .streak-year-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+        
+        .streak-year-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .streak-stats {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .streak-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .streak-stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .streak-stat-label {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        /* Typography Scale System */
+        :root {
+            --text-xs: 0.75rem;     /* 12px - small labels, metadata */
+            --text-sm: 0.875rem;    /* 14px - card content, filters */
+            --text-base: 1rem;      /* 16px - body text, descriptions */
+            --text-lg: 1.125rem;    /* 18px - secondary headings */
+            --text-xl: 1.25rem;     /* 20px - section headers */
+            --text-2xl: 1.5rem;     /* 24px - page subtitle */
+            --text-3xl: 1.875rem;   /* 30px - main title */
+            --text-4xl: 2.25rem;    /* 36px - hero title */
+            
+            /* Line heights for better readability */
+            --leading-tight: 1.25;
+            --leading-snug: 1.375;
+            --leading-normal: 1.5;
+            --leading-relaxed: 1.625;
+            
+            /* Letter spacing for monospace optimization */
+            --tracking-tight: -0.025em;
+            --tracking-normal: 0;
+            --tracking-wide: 0.025em;
+        }
+        
+        /* Main title styling */
+        .hero-title {
+            font-size: var(--text-4xl);
+            font-weight: 700;
+            line-height: var(--leading-tight);
+            letter-spacing: var(--tracking-tight);
+        }
+        
+        .hero-subtitle {
+            font-size: var(--text-xl);
+            font-weight: 400;
+            line-height: var(--leading-normal);
+            letter-spacing: var(--tracking-normal);
+        }
+        
+        .hero-link {
+            font-size: var(--text-lg);
+            font-weight: 500;
+            line-height: var(--leading-normal);
+        }
+        
+        /* Calendar header typography */
+        .calendar-header-day {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            line-height: var(--leading-tight);
+            letter-spacing: var(--tracking-wide);
+        }
+        
+        /* Week labels */
+        .week-label-text {
+            font-size: var(--text-xs);
+            font-weight: 600;
+            line-height: var(--leading-tight);
+            letter-spacing: var(--tracking-wide);
+        }
+        
+        /* Day labels in calendar */
+        .day-date-label {
+            font-size: 0.6875rem; /* 11px - very compact for date labels */
+            font-weight: 500;
+            line-height: var(--leading-tight);
+            letter-spacing: var(--tracking-normal);
+        }
+        
+        /* Card typography hierarchy */
+        .card-category {
+            font-size: 0.6875rem; /* 11px */
+            font-weight: 600;
+            line-height: var(--leading-tight);
+            letter-spacing: var(--tracking-wide);
+            text-transform: uppercase;
+        }
+        
+        .card-title {
+            font-size: var(--text-base);
+            font-weight: 700;
+            line-height: var(--leading-tight);
+            letter-spacing: var(--tracking-tight);
+        }
+        
+        .card-description {
+            font-size: var(--text-sm);
+            font-weight: 400;
+            line-height: var(--leading-relaxed);
+            letter-spacing: var(--tracking-normal);
+        }
+        
+        .card-link {
+            font-size: var(--text-xs);
+            font-weight: 600;
+            line-height: var(--leading-tight);
+            letter-spacing: var(--tracking-normal);
+        }
+        
+        .card-metadata {
+            font-size: 0.6875rem; /* 11px */
+            font-weight: 500;
+            line-height: var(--leading-tight);
+            letter-spacing: var(--tracking-normal);
+        }
+        
+        /* Filter typography */
+        .filter-toggle {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            line-height: var(--leading-tight);
+        }
+        
+        .filter-button {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            line-height: var(--leading-tight);
+            letter-spacing: var(--tracking-normal);
+        }
+        
+        /* Stack indicator typography */
+        .stack-count {
+            font-size: 0.6875rem; /* 11px */
+            font-weight: 700;
+            line-height: var(--leading-tight);
+        }
+        
+        /* Navigation counter */
+        .nav-counter-text {
+            font-size: 0.6875rem; /* 11px */
+            font-weight: 700;
+            line-height: var(--leading-tight);
+        }
+        
+        .calendar-header-container {
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.75rem;
+        }
+        
+        .calendar-header-row {
+            padding: 1rem;
+        }
+        
+        .day-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .week-container {
+            margin-bottom: 1.5rem;
+        }
+        
+        .week-row {
+            border: 1px solid #f3f4f6;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            background: #fefefe;
+        }
+        
+        .week-label-external {
+            width: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            margin-right: 1rem;
+        }
+        
+        .week-label {
+            transform: rotate(-90deg);
+            white-space: nowrap;
+            transform-origin: center;
+            font-size: 0.75rem !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.025em !important;
+        }
+        
+        .day-container {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .day-label {
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .empty-card:hover {
+            background-color: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .project-card {
+            min-height: 17rem; /* Slightly taller for better content spacing */
+            overflow: hidden;
+        }
+        
+        /* Improved card content spacing */
+        .card-content {
+            padding: 1rem; /* More generous padding */
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 0.75rem; /* Consistent spacing between elements */
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+        }
+        
+        /* Stacked card styles */
+        .card-stack {
+            position: relative;
+            height: 17rem; /* Match updated card height */
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .card-stack:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stacked-card {
+            background: white;
+            border-radius: 0.75rem;
+            border: 1px solid #f3f4f6;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease-out;
+            overflow: hidden;
+        }
+        
+        .stacked-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stacked-card.stacked {
+            pointer-events: none;
+        }
+        
+        .card-stack.expanded .stacked-card {
+            pointer-events: auto;
+        }
+        
+        .card-stack.expanded:hover {
+            transform: none;
+        }
+        
+        .stack-indicator {
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .stack-navigation {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 6px 12px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            white-space: nowrap;
+            transform: rotate(-90deg);
+            margin-top: 20px;
+        }
+        
+        .week-navigation-container {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .card-stack:hover + * .week-navigation-container,
+        .week-navigation-container.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* Ensure smooth interaction with navigation */
+        .stack-navigation * {
+            pointer-events: auto;
+        }
+        
+        /* Hide stack indicator on hover */
+        .card-stack:hover .stack-indicator {
+            opacity: 0;
+        }
+        
+        .nav-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+        }
+        
+        .nav-arrow:hover {
+            background: #2563eb;
+            transform: scale(1.1);
+        }
+        
+        .nav-counter {
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            min-width: 32px;
+            text-align: center;
+        }
+        
+        .card-stack.expanded .stack-indicator {
+            opacity: 0.8;
+        }
+        
+        .card-stack.expanded .stack-indicator:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        
+        /* Add visual cue for cycling area */
+        .card-stack.expanded::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border-radius: 0 0.75rem 0 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        /* Current date indicator styles */
+        .current-day-header {
+            position: relative;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+            border-radius: 0.5rem;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        
+        
+        .current-day-header .font-medium {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        
+        .current-day-column {
+            position: relative;
+        }
+        
+        .current-day-column::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            border-radius: 1px;
+            opacity: 0.4;
+        }
+        
+        .current-day-card {
+            border: 2px solid transparent;
+            background-image: linear-gradient(white, white), linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3));
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+        
+        .current-day-empty {
+            border: 2px dashed rgba(59, 130, 246, 0.4);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        
+        .current-day-label {
+            color: #3b82f6 !important;
+            font-weight: 600 !important;
+        }
+        
+        
+        @media (max-width: 768px) {
+            .calendar-header {
+                display: none;
+            }
+            
+            .grid.grid-cols-7 {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .week-header {
+                text-align: left;
+            }
+            
+            .card-stack.expanded .stacked-card {
+                transform: translateX(0) translateY(0) !important;
+                position: relative;
+                margin-bottom: 1rem;
+            }
+            
+            .card-stack.expanded::after {
+                display: none;
+            }
+            
+            .calendar-header-container,
+            #calendar-container {
+                margin-left: 0 !important;
+            }
+            
+            .week-container {
+                position: relative;
+                padding-top: 2rem;
+            }
+            
+            .week-label-external {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                transform: none;
+                margin-right: 0;
+            }
+            
+            .week-label {
+                transform: none;
+                text-align: center;
+            }
+            
+            .week-navigation-container {
+                position: relative !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                margin: 8px 0;
+                transform: none;
+            }
+            
+            .stack-navigation {
+                transform: none !important;
+                margin-top: 0;
+            }
+            
+            .week-navigation-container.active {
+                opacity: 1 !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="hero-title text-gray-900 mb-4">vibespin projects</h1>
+            <p class="hero-subtitle text-gray-600 mb-4">a showcase of my work and experiments</p>
+            <a href="https://github.com/vibespin?tab=repositories" target="_blank" rel="noopener noreferrer" class="hero-link inline-flex items-center gap-2 text-gray-600 hover:text-primary transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.30.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                <span>view all repositories</span>
+            </a>
+        </header>
+
+        <!-- Calendar header -->
+        <div class="calendar-header-container ml-24 mb-6">
+            <div class="calendar-header-row">
+                <div class="grid grid-cols-7 gap-4">
+                    <div class="day-header text-center">
+                        <div class="calendar-header-day text-gray-700 py-2">monday</div>
+                    </div>
+                    <div class="day-header text-center">
+                        <div class="calendar-header-day text-gray-700 py-2">tuesday</div>
+                    </div>
+                    <div class="day-header text-center">
+                        <div class="calendar-header-day text-gray-700 py-2">wednesday</div>
+                    </div>
+                    <div class="day-header text-center">
+                        <div class="calendar-header-day text-gray-700 py-2">thursday</div>
+                    </div>
+                    <div class="day-header text-center">
+                        <div class="calendar-header-day text-gray-700 py-2">friday</div>
+                    </div>
+                    <div class="day-header text-center">
+                        <div class="calendar-header-day text-gray-700 py-2">saturday</div>
+                    </div>
+                    <div class="day-header text-center">
+                        <div class="calendar-header-day text-gray-700 py-2">sunday</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="ml-24 mb-6 flex items-center justify-between">
+            <!-- Filters -->
+            <div>
+                <button id="filter-toggle" class="filter-toggle flex items-center gap-2 text-gray-600 hover:text-primary transition-colors mb-3">
+                    <svg id="filter-chevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                    <span>filters</span>
+                </button>
+                <div id="filter-content" class="overflow-hidden transition-all duration-300 max-h-0">
+                    <div class="pb-4">
+                        <div class="flex flex-wrap gap-2" id="filter-buttons">
+                            <button class="filter-button px-4 py-2 bg-primary text-white rounded-full transition-all hover:bg-blue-600 active" data-category="all">
+                                all projects
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Zoom Controls -->
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-gray-500 font-medium">view:</span>
+                <div class="flex items-center bg-gray-100 rounded-lg p-1">
+                    <button id="zoom-weekly" class="px-3 py-1 text-xs font-medium rounded transition-all hover:bg-white hover:shadow-sm bg-white shadow-sm">
+                        weekly
+                    </button>
+                    <button id="zoom-yearly" class="px-3 py-1 text-xs font-medium rounded transition-all hover:bg-white hover:shadow-sm text-gray-600">
+                        streak
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar grid -->
+        <div id="calendar-container" class="space-y-4 ml-24">
+            <!-- Weekly rows will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script src="script.js?v=3"></script>
+</body>
+</html>
