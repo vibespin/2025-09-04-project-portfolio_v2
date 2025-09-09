@@ -1,4 +1,5 @@
 // Project showcase functionality
+console.log('Loading updated script.js with notes detection...');
 class ProjectShowcase {
     constructor() {
         this.projects = [];
@@ -32,10 +33,36 @@ class ProjectShowcase {
             
             // Filter for date-prefixed repositories (YYYY-MM-DD pattern)
             console.log('All repos:', repos.map(r => r.name)); // Debug log
-            this.projects = repos
+            const dateFilteredRepos = repos
                 .filter(repo => repo.name.match(/^\d{4}-\d{2}-\d{2}/))
-                .sort((a, b) => b.name.localeCompare(a.name))
-                .map(repo => this.convertGitHubRepo(repo));
+                .sort((a, b) => b.name.localeCompare(a.name));
+            
+            // Fetch detailed repo info including topics for each repo
+            console.log('About to fetch detailed info for repos:', dateFilteredRepos.map(r => r.name));
+            this.projects = await Promise.all(
+                dateFilteredRepos.map(async (repo) => {
+                    try {
+                        console.log('Fetching detailed info for:', repo.full_name);
+                        // Fetch detailed repo info to get topics
+                        const detailResponse = await fetch(`https://api.github.com/repos/${repo.full_name}`, {
+                            headers: headers
+                        });
+                        console.log('Detail response status for', repo.name, ':', detailResponse.status);
+                        if (detailResponse.ok) {
+                            const detailedRepo = await detailResponse.json();
+                            console.log('Got detailed repo data for', repo.name, 'topics:', detailedRepo.topics);
+                            return this.convertGitHubRepo(detailedRepo);
+                        } else {
+                            console.warn('Detail fetch failed for', repo.name, 'using basic info');
+                            // Fallback to basic repo info if detailed fetch fails
+                            return this.convertGitHubRepo(repo);
+                        }
+                    } catch (error) {
+                        console.warn('Failed to fetch details for repo:', repo.name, error);
+                        return this.convertGitHubRepo(repo);
+                    }
+                })
+            );
             
             console.log('Filtered date-prefixed projects:', this.projects); // Debug log
             
@@ -76,8 +103,13 @@ class ProjectShowcase {
     convertGitHubRepo(repo) {
         // Extract category from repo name and convert to readable format
         const nameWithoutPrefix = repo.name.replace(/^\d{4}-\d{2}-\d{2}-/, '');
-        const category = this.extractCategory(repo.name);
         const title = this.formatTitle(repo.name);
+        
+        // Check if this is a note first (based on topics or title)
+        const isNote = (repo.topics && repo.topics.includes('notes')) || title.toLowerCase().includes('daily notes');
+        const category = isNote ? 'Notes' : this.extractCategory(repo.name);
+        
+        console.log('Converting repo:', repo.name, 'Topics from API:', repo.topics, 'Is Note:', isNote, 'Category:', category);
         
         return {
             id: repo.id,
@@ -151,42 +183,116 @@ class ProjectShowcase {
         content.innerHTML = `
             <div class="flex items-center justify-center py-12">
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                <span class="ml-3">loading readme...</span>
+                <span class="ml-3">loading content...</span>
             </div>
         `;
 
         try {
-            // Fetch README from GitHub API
-            const response = await fetch(`https://api.github.com/repos/${repo}/readme`, {
-                headers: this.githubToken ? { 'Authorization': `token ${this.githubToken}` } : {}
-            });
+            let markdownContent = '';
             
-            if (!response.ok) {
-                throw new Error('README not found');
+            // Check if this is a note project by looking for the "notes" topic
+            const isNote = await this.isNoteRepo(repo);
+            
+            if (isNote) {
+                // For notes, fetch the main .md file
+                markdownContent = await this.fetchNoteContent(repo);
+            } else {
+                // For projects, fetch the README as usual
+                markdownContent = await this.fetchReadmeContent(repo);
             }
-
-            const data = await response.json();
-            // Properly decode base64 to UTF-8
-            const base64Content = data.content.replace(/\s/g, ''); // Remove whitespace
-            const binaryString = atob(base64Content);
-            const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            const readmeContent = new TextDecoder('utf-8').decode(bytes);
             
             // Simple markdown to HTML conversion
-            const htmlContent = this.convertMarkdownToHTML(readmeContent);
+            const htmlContent = this.convertMarkdownToHTML(markdownContent);
             content.innerHTML = htmlContent;
             
         } catch (error) {
+            const isNote = await this.isNoteRepo(repo);
+            const contentType = isNote ? 'note' : 'readme';
             content.innerHTML = `
                 <div class="text-center py-12">
-                    <p class="text-gray-500">readme not available</p>
-                    <p class="text-sm text-gray-400 mt-2">this repository may not have a readme file</p>
+                    <p class="text-gray-500">${contentType} not available</p>
+                    <p class="text-sm text-gray-400 mt-2">this repository may not have a ${contentType} file</p>
                 </div>
             `;
         }
+    }
+
+    async isNoteRepo(repo) {
+        try {
+            // Get repository info to check topics
+            const response = await fetch(`https://api.github.com/repos/${repo}`, {
+                headers: this.githubToken ? { 'Authorization': `token ${this.githubToken}` } : {}
+            });
+            
+            if (!response.ok) return false;
+            
+            const repoData = await response.json();
+            return repoData.topics && repoData.topics.includes('notes');
+            
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async fetchNoteContent(repo) {
+        // Get repository contents
+        const response = await fetch(`https://api.github.com/repos/${repo}/contents`, {
+            headers: this.githubToken ? { 'Authorization': `token ${this.githubToken}` } : {}
+        });
+        
+        if (!response.ok) {
+            throw new Error('Could not fetch repository contents');
+        }
+        
+        const files = await response.json();
+        
+        // Find the main .md file (prefer one with today's date in the name)
+        const repoName = repo.split('/').pop();
+        const dateMatch = repoName.match(/^(\d{4}-\d{2}-\d{2})/);
+        
+        let targetFile = files.find(file => 
+            file.name.endsWith('.md') && 
+            file.type === 'file' &&
+            (dateMatch ? file.name.includes(dateMatch[1]) : true)
+        );
+        
+        // If no date-specific file, get the first .md file
+        if (!targetFile) {
+            targetFile = files.find(file => file.name.endsWith('.md') && file.type === 'file');
+        }
+        
+        if (!targetFile) {
+            throw new Error('No markdown file found');
+        }
+        
+        // Fetch the file content
+        const fileResponse = await fetch(targetFile.download_url);
+        if (!fileResponse.ok) {
+            throw new Error('Could not fetch file content');
+        }
+        
+        return await fileResponse.text();
+    }
+
+    async fetchReadmeContent(repo) {
+        // Fetch README from GitHub API (original logic)
+        const response = await fetch(`https://api.github.com/repos/${repo}/readme`, {
+            headers: this.githubToken ? { 'Authorization': `token ${this.githubToken}` } : {}
+        });
+        
+        if (!response.ok) {
+            throw new Error('README not found');
+        }
+
+        const data = await response.json();
+        // Properly decode base64 to UTF-8
+        const base64Content = data.content.replace(/\s/g, ''); // Remove whitespace
+        const binaryString = atob(base64Content);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return new TextDecoder('utf-8').decode(bytes);
     }
 
     createReadmeModal() {
@@ -548,6 +654,7 @@ class ProjectShowcase {
         const yearData = {
             months: {},
             totalProjects: 0,
+            totalNotes: 0,
             activeMonths: 0,
             maxProjectsPerDay: 0
         };
@@ -573,7 +680,13 @@ class ProjectShowcase {
                         yearData.months[month][day] = [];
                     }
                     yearData.months[month][day].push(project);
-                    yearData.totalProjects++;
+                    
+                    // Count projects and notes separately
+                    if (this.isNoteProject(project)) {
+                        yearData.totalNotes++;
+                    } else {
+                        yearData.totalProjects++;
+                    }
                     
                     // Track max projects per day for intensity calculation
                     const dayCount = yearData.months[month][day].length;
@@ -609,6 +722,10 @@ class ProjectShowcase {
                         <div class="streak-stat-label">projects</div>
                     </div>
                     <div class="streak-stat">
+                        <div class="streak-stat-value">${yearData.totalNotes}</div>
+                        <div class="streak-stat-label">notes</div>
+                    </div>
+                    <div class="streak-stat">
                         <div class="streak-stat-value">${yearData.activeMonths}</div>
                         <div class="streak-stat-label">active months</div>
                     </div>
@@ -632,7 +749,7 @@ class ProjectShowcase {
             // Render each day of the month
             for (let day = 1; day <= daysInMonth; day++) {
                 const projects = monthData[day] || [];
-                const intensity = this.calculateIntensity(projects.length, yearData.maxProjectsPerDay);
+                const intensity = this.calculateIntensity(projects, yearData.maxProjectsPerDay);
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 
                 html += `
@@ -663,15 +780,33 @@ class ProjectShowcase {
         return html;
     }
     
-    calculateIntensity(projectCount, maxCount) {
-        if (projectCount === 0) return 'empty';
+    calculateIntensity(projects, maxCount) {
+        if (projects.length === 0) return 'empty';
         if (maxCount === 0) return 'empty';
         
-        const ratio = projectCount / maxCount;
-        if (ratio <= 0.25) return 'level-1';
-        if (ratio <= 0.5) return 'level-2';
-        if (ratio <= 0.75) return 'level-3';
-        return 'level-4';
+        // Check what types of projects we have
+        const hasNotes = projects.some(p => this.isNoteProject(p));
+        const hasProjects = projects.some(p => !this.isNoteProject(p));
+        
+        // Determine base color
+        let colorBase;
+        if (hasNotes && hasProjects) {
+            colorBase = 'purple'; // Both notes and projects
+        } else if (hasNotes) {
+            colorBase = 'green'; // Only notes
+        } else {
+            colorBase = 'blue'; // Only projects
+        }
+        
+        // Determine intensity level
+        const ratio = projects.length / maxCount;
+        let level;
+        if (ratio <= 0.25) level = '1';
+        else if (ratio <= 0.5) level = '2';
+        else if (ratio <= 0.75) level = '3';
+        else level = '4';
+        
+        return `${colorBase}-level-${level}`;
     }
     
     addStreakEventListeners() {
@@ -927,8 +1062,12 @@ class ProjectShowcase {
 
     renderProjectCard(project, isCurrentDay = false) {
         const currentDayClass = isCurrentDay ? 'current-day-card' : '';
+        const isNote = this.isNoteProject(project);
+        const borderColor = isNote ? 'border-green-200' : 'border-gray-100';
+        const hoverShadow = isNote ? 'hover:shadow-green-100' : 'hover:shadow-lg';
+        
         return `
-            <div class="project-card bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 h-68 relative border border-gray-100 ${currentDayClass}" 
+            <div class="project-card bg-white rounded-xl shadow-sm ${hoverShadow} transition-all duration-300 transform hover:-translate-y-1 h-68 relative border ${borderColor} ${currentDayClass}" 
                  data-github="${project.githubUrl}"
                  data-repo="${project.githubUrl.split('/').slice(-2).join('/')}">
                 ${this.renderProjectCardContent(project, false)}
@@ -936,12 +1075,34 @@ class ProjectShowcase {
         `;
     }
 
+    isNoteProject(project) {
+        console.log('Checking project for notes:', project.title, 'Topics:', project.topics);
+        
+        // Check if it has the notes topic
+        if (project.topics && project.topics.includes('notes')) {
+            return true;
+        }
+        
+        // Fallback: check if the title contains "daily notes" 
+        const isNote = project.title.toLowerCase().includes('daily notes');
+        if (isNote) {
+            console.log('Detected as note by title pattern:', project.title);
+        }
+        return isNote;
+    }
+
     renderProjectCardContent(project, hasStackIndicator = false) {
+        const isNote = this.isNoteProject(project);
+        const categoryColors = isNote 
+            ? 'text-green-700 bg-green-50' 
+            : 'text-blue-600 bg-blue-50';
+        const categoryText = isNote ? 'notes' : 'project';
+        
         return `
             <div class="card-content" data-github="${project.githubUrl}" data-repo="${project.githubUrl.split('/').slice(-2).join('/')}">
                 <div class="card-header">
-                    <span class="card-category text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                        ${project.category.toLowerCase()}
+                    <span class="card-category ${categoryColors} px-2 py-1 rounded-full">
+                        ${categoryText}
                     </span>
                 </div>
                 
@@ -967,7 +1128,7 @@ class ProjectShowcase {
                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
-                            <span>readme</span>
+                            <span>${isNote ? 'notes' : 'readme'}</span>
                         </button>
                     </div>
                 </div>
